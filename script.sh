@@ -7,27 +7,19 @@ tail -n  2 data2.csv > datas2.csv
 cat datas2.csv > data2.csv
 rm datas*.csv
 
-#Cambia tabulaciones y espacios por comas como separador
-sed 's/[ ][ ]*/,/g' data2.csv > datas2.csv
-sed 's/\t/,/g' datas2.csv > datas22.csv
-cat datas22.csv > data2.csv
-sed 's/\t/,/g' data1.csv > datas1.csv
-cat datas1.csv > data1.csv
-sed 's/\t/,/g' data3.csv > datas3.csv
-cat datas3.csv > data3.csv
-rm datas*.csv
+#Imprimir número de la fila en primera columna
+awk '{print FNR "," $0 }' data1.csv > datas1.csv
+awk '{print FNR "," $0 }' data2.csv > datas2.csv
+awk '{print FNR "," $0 }' data3.csv > datas3.csv
 
-#Crear .txt con lista de archivos en la carpeta
-ls -1 > lista1.txt
-sed -n '/.csv/p' lista1.txt > lista.txt
-
-#Contador de filas
-index=1
-
-#Primer for
-for n in $(cat lista.txt);
+#Agregar nueva columna con nombre del archivo
+for f in datas*.csv;
 do
-index=1
-echo $n,$index; nl $n
-index=$(($index + 1))
+	sed -i "/^$f,/! s/^/$f,/" "$f"
 done
+
+#Unir los archivos
+{ for f in datas*.csv; do tail -n+1 "$f"; done; } > archivo.csv
+cat archivo.csv
+
+rm datas*.csv
